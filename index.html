@@ -1,0 +1,106 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+  <head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width,
+initial-scale=1.0"> 
+  <title>Commit</title>
+  <style> 
+    body { 
+      margin: 0; 
+      padding: 0; 
+      background-image: url("image3.jpg"); 
+      background-size: cover; /* sakto sa buong screen */ 
+      background-repeat: no-repeat; 
+      background-attachment: fixed; /* di gagalaw pag scroll */ 
+      background-position: center; /* laging nasa gitna */ 
+      font-family: Arial, Helvetica, sans-serif, sans-serif;
+    }
+    .login-box { 
+      background: rgba(255, 255, 255, 0.9); 
+      width: 300px; 
+      margin: 100px auto; 
+      padding: 30px; 
+      border-radius: 10px; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+      text-align: center; 
+    }
+    h1 { 
+      margin-bottom: 20px; 
+      color: purple; 
+    }
+    label { 
+      display: block; 
+      margin: 10px 0 5px; 
+      font-weight: bold; 
+      text-align: left; 
+    }
+
+    input[type="text"], 
+    input[type="password"], 
+    input[type="email"] { 
+      width: 100%; 
+      padding: 8px; 
+      margin-bottom: 15px; 
+      border: 1px solid #ccc; 
+      border-radius: 5px; 
+    }
+    .remember { 
+      display: flex; 
+      margin-bottom: 15px; 
+      align-items: center; 
+      gap: 5px; /* space between box at label */ 
+    }
+    button { 
+      background-color: aqua; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 5px; 
+      font-size: 16px; 
+      cursor: pointer; 
+    }
+    button:hover { 
+      background-color: #00cccc; 
+    }
+</style> 
+  </head>
+    <body> 
+      <div class="login-box"> 
+        <form onsubmit="return false;"> 
+          <h1>Commit</h1>
+
+          <label for="email">Username:
+          </label> 
+          <input type="email" placeholder="Email or Phone" 
+          id="email">
+
+          <label for="password">Password:
+          </label> 
+            <input type="password" placeholder="Password" 
+            id="password">
+<div class="remember"> 
+  <input type="checkbox" id="rememberMe" name="rememberMe"> 
+  <label for="rememberMe">Remember Me
+  </label>
+  <br><br> 
+</div class = "button">
+  <button type="button" onclick="auth()">Login</button><br>
+  </form> 
+</div>
+
+<script> 
+function auth(){ 
+  var email = document.getElementById('email').value; 
+  var password = document.getElementById('password').value; 
+  
+  if(email === 'admin@gmail.com' && password === 
+  '000000'){ 
+    alert("Login successfully"); 
+    window.location.assign('page2.html');
+  } else { 
+    alert("Invalid information"); 
+  } 
+}
+</script> 
+</body> 
+</html>

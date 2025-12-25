@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Goal</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  .container {
+    max-width: 400px;
+    margin: auto;
+  }
+
+  .photo-upload {
+    width: 100%;
+    height: 200px;
+    background-color: #1e1e1e;
+    border: 2px dashed yellowgreen;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-direction: column;
+  }
+
+  .photo-upload img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+  .form-group {
+    margin-top: 15px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #1e1e1e;
+    color: #fff;
+  }
+
+  .submit-btn {
+    width: 100%;
+    background-color: yellowgreen;
+    border: none;
+    color: #fff;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Create Goal</h2>
+
+  <div class="photo-upload" id="photoBox">
+  <input type="file" id="photoInput" accept="image/*" style="display:none;">
+  <span id="photoText">📸 Add Photo</span>
+  <img id="photoPreview" style="display:none;">
+  </div>
+
+  <div class="form-group">
+    <label>Name</label>
+    <input type="text" id="goalName" placeholder="Specific and measurable goal">
+  </div>
+
+  <div class="form-group">
+    <label>Deadline</label>
+    <input type="date" id="goalDeadline">
+  </div>
+
+  <div class="form-group">
+    <label>Category</label>
+    <select id="goalCategory">
+      <option>Personal</option>
+      <option>Career</option>
+      <option>Fitness</option>
+      <option>Others</option>
+    </select>
+  </div>
+
+  <button class="submit-btn" onclick="saveGoal()">Save Goal</button>
+</div>
+
+<div class="form-group">
+  <label>Reminder Time</label>
+  <input type="time" id="goalReminderTime">
+</div>
+
+<script>
+
+let selectedPhotoBase64 = "";
+
+// CLICK PHOTO BOX → OPEN FILE PICKER
+document.getElementById("photoBox").addEventListener("click", () => {
+  document.getElementById("photoInput").click();
+});
+
+// Convert uploaded photo to Base64
+document.getElementById("photoInput").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    selectedPhotoBase64 = reader.result;
+    document.getElementById("photoPreview").src = selectedPhotoBase64;
+    document.getElementById("photoPreview").style.display = "block";
+    document.getElementById("photoText").style.display = "none";
+  };
+  reader.readAsDataURL(file);
+});
+
+
+// ⭐ LOAD EDIT MODE IF EXISTS
+window.addEventListener("DOMContentLoaded", () => {
+
+  const editGoal = JSON.parse(localStorage.getItem("editGoal"));
+
+  if (editGoal) {
+
+    // Fill inputs
+    document.getElementById("goalName").value = editGoal.name || "";
+    document.getElementById("goalDeadline").value = editGoal.deadline || "";
+    document.getElementById("goalCategory").value = editGoal.category || "";
+    document.getElementById("goalReminderTime").value = editGoal.reminderTime || "";
+
+    // Load photo
+    if (editGoal.photo) {
+      selectedPhotoBase64 = editGoal.photo;
+      document.getElementById("photoPreview").src = editGoal.photo;
+      document.getElementById("photoPreview").style.display = "block";
+      document.getElementById("photoText").style.display = "none";
+    }
+
+    // Change button text
+    document.querySelector(".submit-btn").textContent = "Update Goal";
+  }
+});
+
+
+// ⭐ SAVE OR UPDATE GOAL
+function saveGoal() {
+
+  const editGoal = JSON.parse(localStorage.getItem("editGoal"));
+  let goals = JSON.parse(localStorage.getItem("goals")) || [];
+
+  let goalData = {
+  id: editGoal ? editGoal.id : Date.now(),
+  name: document.getElementById("goalName").value.trim(),
+  deadline: document.getElementById("goalDeadline").value,
+  category: document.getElementById("goalCategory").value,
+  reminderTime: document.getElementById("goalReminderTime").value, // ⏰
+  photo: selectedPhotoBase64 || (editGoal ? editGoal.photo : ""),
+  progress: editGoal ? editGoal.progress : 0
+};
+
+  // UPDATE
+  if (editGoal) {
+    goals = goals.map(g => g.id === editGoal.id ? goalData : g);
+  }
+  // CREATE
+  else {
+    goals.push(goalData);
+  }
+
+  // SAVE BACK
+  localStorage.setItem("goals", JSON.stringify(goals));
+  localStorage.removeItem("editGoal");
+
+  // RETURN TO PAGE 2
+  window.location.href = "page2.html";
+}
+
+</script>
+
+</body>
+</html>

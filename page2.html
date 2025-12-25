@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goals</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url("concept.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+}
+
+.quote-box {
+  margin: 10px auto;
+  padding: 12px 25px;
+  width: fit-content;
+  max-width: 80%;
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  color: purple;
+  font-size: 18px;
+  font-family: Georgia, serif;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: purple;
+  text-align: center;
+  font-size: 28px;
+}
+
+.tabs {
+  text-align: left;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+.tab {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-right: 8px;
+  border-radius: 20px;
+  background: #1e1e1e;
+  color:white;
+  margin-bottom: -10px;
+}
+
+.tab.active {
+  background: yellowgreen;
+}
+
+.goal-card {
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  margin: 15px;
+  padding: 10px;
+}
+
+.goal-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.goal-info {
+  flex: 1;
+  color: white;
+}
+
+.goal-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.progress-bar {
+  background: #333;
+  height: 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.progress {
+  background: purple;
+  width: 0%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.plus-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: yellowgreen;
+  color: white;
+  font-size: 30px;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-btn, .delete-btn {
+  background: yellowgreen;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  margin-left: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Commit</h2>
+
+<div class="quote-box">
+  Commitment is the foundation of great accomplishments!
+</div>
+
+<div class="tabs">
+  <span class="tab active">Goals</span>
+</div>
+
+<div id="goalsList"></div>
+
+<button class="plus-btn" onclick="goToPage3()">+</button>
+
+<script>
+function goToPage3() {
+  localStorage.removeItem("editGoal");
+  window.location.href = "page3.html";
+}
+
+function loadGoals() {
+  const goals = JSON.parse(localStorage.getItem("goals")) || [];
+  const list = document.getElementById("goalsList");
+  list.innerHTML = "";
+
+  if (goals.length === 0) {
+    list.innerHTML =
+      "<p style='text-align:center;color:white;margin-top:50px;'>No goals yet. Click + to add one!</p>";
+    return;
+  }
+
+  goals.forEach(g => {
+    const daysLeft = Math.ceil(
+      (new Date(g.deadline) - new Date()) / (1000 * 60 * 60 * 24)
+    );
+
+    const card = document.createElement("div");
+    card.className = "goal-card";
+
+    card.innerHTML = `
+      <img src="${g.photo || 'https://via.placeholder.com/100'}">
+      <div class="goal-info">
+        <h3>${g.name}</h3>
+        <p>${daysLeft > 0 ? daysLeft + " days left" : "Deadline reached"}</p>
+        <div class="progress-bar">
+          <div class="progress" style="width:${g.progress || 0}%"></div>
+        </div>
+      </div>
+      <button class="edit-btn" data-id="${g.id}">Edit</button>
+      <button class="delete-btn" data-id="${g.id}">Delete</button>
+    `;
+
+    list.appendChild(card);
+  });
+}
+
+loadGoals();
+
+document.addEventListener("click", function(e) {
+  const id = e.target.dataset.id;
+
+  if (e.target.classList.contains("edit-btn")) {
+    const goals = JSON.parse(localStorage.getItem("goals")) || [];
+    const goal = goals.find(g => g.id == id);
+    localStorage.setItem("editGoal", JSON.stringify(goal));
+    window.location.href = "page3.html";
+  }
+
+  if (e.target.classList.contains("delete-btn")) {
+    let goals = JSON.parse(localStorage.getItem("goals")) || [];
+    goals = goals.filter(g => g.id != id);
+    localStorage.setItem("goals", JSON.stringify(goals));
+    loadGoals();
+  }
+});
+</script>
+
+</body>
+</html>
