@@ -4,84 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Goal</title>
+
 <style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #121212;
-    color: #fff;
-    margin: 0;
-    padding: 20px;
-  }
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #121212;
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
 
-  h2 {
-    text-align: center;
-  }
+h2 {
+  text-align: center;
+}
 
-  .container {
-    max-width: 400px;
-    margin: auto;
-  }
+.container {
+  max-width: 400px;
+  margin: auto;
+}
 
-  .photo-upload {
-    width: 100%;
-    height: 200px;
-    background-color: #1e1e1e;
-    border: 2px dashed yellowgreen;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    flex-direction: column;
-  }
+.photo-upload {
+  width: 100%;
+  height: 200px;
+  background-color: #1e1e1e;
+  border: 2px dashed yellowgreen;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-direction: column;
+}
 
-  .photo-upload img {
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    object-fit: cover;
-  }
+.photo-upload img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
 
-  .form-group {
-    margin-top: 15px;
-  }
+.form-group {
+  margin-top: 15px;
+}
 
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
+label {
+  display: block;
+  margin-bottom: 5px;
+}
 
-  input, textarea, select {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    background-color: #1e1e1e;
-    color: #fff;
-  }
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1e1e1e;
+  color: #fff;
+}
 
-  .submit-btn {
-    width: 100%;
-    background-color: yellowgreen;
-    border: none;
-    color: #fff;
-    padding: 12px;
-    margin-top: 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.submit-btn {
+  width: 100%;
+  background-color: yellowgreen;
+  border: none;
+  color: #fff;
+  padding: 12px;
+  margin-top: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
   <h2>Create Goal</h2>
 
+  <!-- PHOTO -->
   <div class="photo-upload" id="photoBox">
-  <input type="file" id="photoInput" accept="image/*" style="display:none;">
-  <span id="photoText">📸 Add Photo</span>
-  <img id="photoPreview" style="display:none;">
+    <input type="file" id="photoInput" accept="image/*" hidden>
+    <span id="photoText">📸 Add Photo</span>
+    <img id="photoPreview" hidden>
   </div>
 
   <div class="form-group">
@@ -104,97 +107,107 @@
     </select>
   </div>
 
+  <!-- ⏰ REMINDER -->
+  <div class="form-group">
+    <label>Reminder Time</label>
+    <input type="time" id="goalReminderTime">
+  </div>
+
   <button class="submit-btn" onclick="saveGoal()">Save Goal</button>
 </div>
 
-<div class="form-group">
-  <label>Reminder Time</label>
-  <input type="time" id="goalReminderTime">
-</div>
-
 <script>
-
 let selectedPhotoBase64 = "";
 
-// CLICK PHOTO BOX → OPEN FILE PICKER
-document.getElementById("photoBox").addEventListener("click", () => {
-  document.getElementById("photoInput").click();
-});
+/* 📸 PHOTO */
+photoBox.onclick = () => photoInput.click();
 
-// Convert uploaded photo to Base64
-document.getElementById("photoInput").addEventListener("change", function(e) {
+photoInput.addEventListener("change", e => {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
     selectedPhotoBase64 = reader.result;
-    document.getElementById("photoPreview").src = selectedPhotoBase64;
-    document.getElementById("photoPreview").style.display = "block";
-    document.getElementById("photoText").style.display = "none";
+    photoPreview.src = reader.result;
+    photoPreview.hidden = false;
+    photoText.hidden = true;
   };
   reader.readAsDataURL(file);
 });
 
+/* 🔔 REQUEST NOTIFICATION PERMISSION */
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
 
-// ⭐ LOAD EDIT MODE IF EXISTS
+/* ✏️ EDIT MODE */
 window.addEventListener("DOMContentLoaded", () => {
-
   const editGoal = JSON.parse(localStorage.getItem("editGoal"));
 
   if (editGoal) {
+    goalName.value = editGoal.name;
+    goalDeadline.value = editGoal.deadline;
+    goalCategory.value = editGoal.category;
+    goalReminderTime.value = editGoal.reminderTime;
 
-    // Fill inputs
-    document.getElementById("goalName").value = editGoal.name || "";
-    document.getElementById("goalDeadline").value = editGoal.deadline || "";
-    document.getElementById("goalCategory").value = editGoal.category || "";
-    document.getElementById("goalReminderTime").value = editGoal.reminderTime || "";
-
-    // Load photo
     if (editGoal.photo) {
       selectedPhotoBase64 = editGoal.photo;
-      document.getElementById("photoPreview").src = editGoal.photo;
-      document.getElementById("photoPreview").style.display = "block";
-      document.getElementById("photoText").style.display = "none";
+      photoPreview.src = editGoal.photo;
+      photoPreview.hidden = false;
+      photoText.hidden = true;
     }
 
-    // Change button text
     document.querySelector(".submit-btn").textContent = "Update Goal";
   }
 });
 
-
-// ⭐ SAVE OR UPDATE GOAL
+/* 💾 SAVE GOAL */
 function saveGoal() {
-
   const editGoal = JSON.parse(localStorage.getItem("editGoal"));
   let goals = JSON.parse(localStorage.getItem("goals")) || [];
 
-  let goalData = {
-  id: editGoal ? editGoal.id : Date.now(),
-  name: document.getElementById("goalName").value.trim(),
-  deadline: document.getElementById("goalDeadline").value,
-  category: document.getElementById("goalCategory").value,
-  reminderTime: document.getElementById("goalReminderTime").value, // ⏰
-  photo: selectedPhotoBase64 || (editGoal ? editGoal.photo : ""),
-  progress: editGoal ? editGoal.progress : 0
-};
+  const goalData = {
+    id: editGoal ? editGoal.id : Date.now(),
+    name: goalName.value.trim(),
+    deadline: goalDeadline.value,
+    category: goalCategory.value,
+    reminderTime: goalReminderTime.value,
+    photo: selectedPhotoBase64 || (editGoal ? editGoal.photo : ""),
+    progress: editGoal ? editGoal.progress : 0
+  };
 
-  // UPDATE
   if (editGoal) {
     goals = goals.map(g => g.id === editGoal.id ? goalData : g);
-  }
-  // CREATE
-  else {
+  } else {
     goals.push(goalData);
   }
 
-  // SAVE BACK
   localStorage.setItem("goals", JSON.stringify(goals));
   localStorage.removeItem("editGoal");
 
-  // RETURN TO PAGE 2
   window.location.href = "page2.html";
 }
 
+/* ⏰ DAILY REMINDER CHECK */
+setInterval(() => {
+  const goals = JSON.parse(localStorage.getItem("goals")) || [];
+  const now = new Date();
+
+  const timeNow =
+    now.getHours().toString().padStart(2, "0") + ":" +
+    now.getMinutes().toString().padStart(2, "0");
+
+  goals.forEach(goal => {
+    if (
+      goal.reminderTime === timeNow &&
+      now.getSeconds() === 0 &&
+      Notification.permission === "granted"
+    ) {
+      new Notification("Commit Reminder", {
+        body: `${goal.name}\nCommitment is the foundation of great accomplishments!`
+      });
+    }
+  });
+}, 1000);
 </script>
 
 </body>
